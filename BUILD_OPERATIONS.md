@@ -152,6 +152,33 @@
 
 ---
 
+## v2.4 · 2026-04-10 · GitHub 上传 + 一键上传 Skill
+
+### 本次处理的任务
+
+**GitHub 首次上传（AI-Project-OS）**
+
+| 步骤 | 操作 | 结果 |
+|------|------|------|
+| 凭证绑定 | `git config --global credential.helper store` + 写入 `~/.git-credentials` | Token 永久存储，后续无需重新输入 |
+| 新建仓库 | GitHub API `POST /user/repos`（name: AI-Project-OS） | 仓库创建成功，不影响 seed-ai |
+| 初始化 & 关联 | `git init` + `git remote add origin` | 本地 .git 初始化，关联新仓库 |
+| 暂存 & 提交 | `git add`（显式列出15个目标文件）+ `git commit` | 15 文件，3208 行 |
+| 推送 | `git push -u origin master` | `* [new branch] master -> master` ✅ |
+
+**仓库地址**：https://github.com/jiayu6954-sudo/AI-Project-OS
+
+**关键踩坑**：
+- `curl -d` 传含中文描述的 JSON → `Problems parsing JSON` 错误 → 改为 `--data-raw` 并使用纯英文描述解决
+- 旧的错误 remote（seed-ai）需先 `git remote remove origin` 再重新添加
+
+**一键上传 Skill 创建**：
+- 路径：`~/.claude/skills/github-upload.md`
+- 触发：在 Claude Code 中输入 `/github-upload`
+- 覆盖范围：凭证绑定 → 新建仓库 → init → 暂存 → 提交 → 推送 → 验证 + 常见问题排查
+
+---
+
 ## v2.3 · 2026-04-10 · GitHub 打包 + 白皮书
 
 ### 本次处理的任务
@@ -205,4 +232,16 @@ E:\AI-Methodology\
 
 ---
 
-*BUILD_OPERATIONS 版本：v2.3 · 更新：2026-04-10 · 下次更新节点：B-02/B-03 提示词文件创建*
+---
+
+## Claude Skill 清单
+
+| Skill 文件 | 触发命令 | 用途 |
+|-----------|---------|------|
+| `~/.claude/skills/ai-workflow.md` | `/ai-workflow` | 触发完整 6 阶段工作流 |
+| `~/.claude/skills/ai-methodology-ops.md` | `/ai-methodology-ops` | 快速恢复本仓库操作上下文 |
+| `~/.claude/skills/github-upload.md` | `/github-upload` | 一键打包上传 GitHub（新建仓库全流程）|
+
+---
+
+*BUILD_OPERATIONS 版本：v2.4 · 更新：2026-04-10 · 下次更新节点：B-02/B-03 提示词文件创建*
