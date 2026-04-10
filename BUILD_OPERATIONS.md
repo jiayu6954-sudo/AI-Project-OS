@@ -1,8 +1,9 @@
-# BUILD_OPERATIONS — AI-Methodology 系统构建操作记忆库
+# BUILD_OPERATIONS — AI-Project-OS 构建操作记忆库
 
-> **定位**：本文件是随代码仓库存储的操作历史，记录每次迭代的问题、解决方案和待处理事项。  
+> **定位**：随仓库存储的完整迭代历史，记录每次构建的问题、解决方案和 Backlog。  
 > **迭代规则**：每次修改本仓库后，更新"当前文件清单"和 Backlog。  
-> **Claude 会话专用记忆**：见 `~/.claude/skills/ai-methodology-ops.md`（可用 `/ai-methodology-ops` 触发）
+> **Claude 会话记忆**：`~/.claude/projects/.../memory/build-ops.md`（自动加载）  
+> **可调用 Skill**：`/ai-workflow` · `/ai-methodology-ops` · `/github-upload`
 
 ---
 
@@ -11,100 +12,139 @@
 **目的**：构建一套工业级 AI 协作工程方法论，让任何人的任何项目都能复用相同的 AI 协作流程。
 
 **核心设计**：两层分离
-- **通用层**（本仓库）= 流程 HOW + 提示词 + 清单 — 所有项目共用
+- **通用层**（本仓库）= 流程 HOW + 提示词 + 清单 — 所有项目、所有 AI 工具共用
 - **项目层**（project-overlay）= 决策 WHAT + 踩坑 WHY — 每项目一份
 
-**提炼来源**：医保智能审核系统 · CDN边缘计算基础设施 · Seed AI CLI（三个工业级项目）
+**工具无关性**：工作流模板、审查清单、约束提示词可直接用于任何 LLM（ChatGPT / Gemini / Cursor / 本地模型等）。`/skill` 触发命令仅为 Claude Code 专属快捷方式。
+
+**提炼来源**：医保智能审核系统 · CDN 边缘计算基础设施 · Seed AI CLI（三个工业级项目）  
+**GitHub 仓库**：https://github.com/jiayu6954-sudo/AI-Project-OS
 
 ---
 
 ## v2.1 · 2026-04-10 · 初始构建
 
-### 本次处理的问题
+### 修复的问题
 
-#### 🔴 P0：严重缺陷
+#### 🔴 P0 严重缺陷
 
-**问题1 — `checklists/code-review-checklist.md` 格式损坏**
-- **症状**：所有 Markdown 特殊字符前都有反斜杠（`\*`、`\#`、`\|`），文件无法正常渲染
-- **根因**：从已渲染的 Markdown 页面复制内容时，编辑器自动对特殊字符做了转义
-- **解决**：完整重写文件，移除所有转义字符；同时升级为 v1.2，新增 N/A 机制说明、1.5 和 8.5 两条新规则
-- **预防**：以后从网页复制内容后，先粘贴到纯文本编辑器检查是否有多余转义
+| # | 文件 | 问题 | 根因 | 解决 |
+|---|------|------|------|------|
+| 1 | `checklists/code-review-checklist.md` | 所有 Markdown 特殊字符前有反斜杠，无法渲染 | 从渲染页面复制时编辑器自动转义 | 完整重写，升级 v1.2，新增 N/A 机制 + 1.5 + 8.5 两条规则 |
+| 2 | `templates/workflow-template.md` | 附录 A/B/C/D 全是占位符，完全不可用 | v1.0 只设计结构，内容从未填写 | 重写为 v2.1，填入全部 5 个附录实质内容 |
+| 3 | `prompts/02-code-review.md` | 空文件（0 字节） | touch 创建占位符后未写入 | 写入完整审查提示词（标准 + 快速两模式）|
 
-**问题2 — `templates/workflow-template.md` 附录全为占位符**
-- **症状**：附录 A/B/C/D 内容均为 `（将...复制于此）`，完全无法使用
-- **根因**：v1.0 只设计了结构，实质内容从未填写
-- **解决**：重写为 v2.0，填入全部5个附录的可用内容（A=目录架构提示词、B=代码生成约束、C=审查提示词、D=交付清单、E=踩坑表模板）
-- **关键决策**：附录内容内联在同一文件（不拆分），降低使用时的跳转成本
+#### 🟡 P1 架构缺失
 
-**问题3 — `prompts/02-code-review.md` 为空文件**
-- **症状**：文件存在但 0 字节
-- **根因**：用 `touch` 创建占位符后从未写入内容
-- **解决**：写入完整审查提示词（含标准模式 + 快速模式）
-
-#### 🟡 P1：架构缺失
-
-**问题4 — `templates/project-overlay-template.md` 不存在**
-- **症状**："两层分离"设计的核心组件缺失
-- **根因**：概念有描述但实现文件从未创建
-- **解决**：新建8节完整模板（定义书/决策/审查/修复/踩坑/交付状态/经验/项目信息）
-
-**问题5 — `README.md` 内容是 Seed AI 项目的 README**
-- **症状**：文件包含 npm badge、`seed config model` 命令等与方法论库无关的内容
-- **根因**：文件混淆
-- **解决**：完整重写为方法论库 README（含目录结构、使用指南、Skill 接入方法）
-
-**问题6 — `case-studies/` 目录为空**
-- **症状**：目录存在但无任何文件，案例库功能缺失
-- **根因**：从未填充
-- **解决**：创建 `case-studies/README.md`（含案例索引 + 高频踩坑 TOP 10）和第一个实测案例
+| # | 文件 | 问题 | 解决 |
+|---|------|------|------|
+| 4 | `templates/project-overlay-template.md` | 不存在（"两层分离"核心组件缺失）| 新建 8 节完整模板 |
+| 5 | `README.md` | 内容是 Seed AI 项目 README（npm badge、功能列表）| 完整重写为方法论库说明 |
+| 6 | `case-studies/` | 空目录 | 创建索引 + 全流程实测案例（TaskFlow API）|
 
 ### 框架实测：TaskFlow API（Python 3.12 + FastAPI）
 
-**目的**：用一个全新项目（不同语言）验证模板普适性  
-**发现并修复的摩擦点**：
-
-| FP | 描述 | 修复位置 |
-|----|------|---------|
-| FP-1 | 附录 A 无 Python 目录约定（缺 pyproject.toml、包布局规范） | workflow-template.md 附录 A 加语言特定补充 |
-| FP-2 | 清单第三节（AI Provider）对非 AI 项目无 N/A 跳过指引 | code-review-checklist.md 文件头加 N/A 规则 |
-| FP-3 | 阶段二门禁验证命令无 Python 选项（只有 Java/Go/TS） | workflow-template.md 阶段二加 Python 命令组 |
-| FP-4 | Python async Session 全局共享 = 新型 P0（FastAPI 高频错误） | checklist 新增 1.5 + 8.5 两条规则 |
-
-**实测结论**：6阶段骨架完全适用于 Python，主要问题在附录语言特定性不足，已修复。
-
-### 新建/修改文件清单
-
-| 操作 | 文件 | 版本 |
-|------|------|------|
-| 重写 | `README.md` | v2.0 |
-| 重写 | `templates/workflow-template.md` | v2.1 |
-| 新建 | `templates/project-overlay-template.md` | v1.0 |
-| 重写 | `checklists/code-review-checklist.md` | v1.2 |
-| 新建 | `prompts/02-code-review.md` | v1.0 |
-| 新建 | `case-studies/README.md` | v1.0 |
-| 新建 | `case-studies/taskflow-api-2026-04.md` | 实测案例 |
-| 新建 | `BUILD_OPERATIONS.md` | 本文件 |
+| FP | 摩擦点 | 修复位置 |
+|----|--------|---------|
+| FP-1 | 附录 A 无 Python 目录约定 | workflow-template.md 附录 A |
+| FP-2 | 清单第三节对非 AI 项目无 N/A 指引 | code-review-checklist.md 文件头 |
+| FP-3 | 阶段二验证命令无 Python 选项 | workflow-template.md 阶段二 |
+| FP-4 | Python async Session 全局共享（新型 P0）| 清单新增 1.5 + 8.5 |
 
 ---
 
 ## v2.2 · 2026-04-10 · B-01 案例存档补全
 
-### 本次处理的任务
+| 新建文件 | 来源 | 核心内容 |
+|---------|------|---------|
+| `case-studies/医保智能审核系统-2026-04.md` | `工作流.md` | 6 P0（KieSession单例/危险@Cacheable/javax→jakarta）+ 6 轮修复 |
+| `case-studies/CDN边缘计算基础设施-2026-04.md` | `操作记忆库.md` | 7 P0（import末尾/硬编码Key/1276行上帝类）+ 6 轮修复 |
+| `case-studies/SeedAI-2026-04.md` | `OPERATIONS.md` + `README.md` | Provider接口3次重犯 + P016无限循环 + 27项创新 |
 
-**B-01 — 补全三个老项目的案例存档**
-
-将三个原始记录文件按 `project-overlay-template.md` 格式重新组织，生成独立的案例存档文件：
-
-| 文件 | 来源 | 主要内容 |
-|------|------|---------|
-| `case-studies/医保智能审核系统-2026-04.md` | `工作流.md` | 6 P0（KieSession单例、@Cacheable危险缓存、javax→jakarta）+ 6轮修复 |
-| `case-studies/CDN边缘计算基础设施-2026-04.md` | `操作记忆库.md` | 7 P0（import末尾、硬编码API Key、1276行上帝类）+ 6轮修复 |
-| `case-studies/SeedAI-2026-04.md` | `OPERATIONS.md` + `README.md` | AI Provider接口3次重犯 + P016无限循环 + 27项创新 |
-
-**结果**：`case-studies/README.md` 中三个死链全部修复，案例库现在可完整使用。
+**结果**：case-studies/ 三个死链全部修复，案例库完整可用。
 
 ---
 
+## v2.3 · 2026-04-10 · GitHub 打包 + 白皮书
+
+| 操作 | 文件 | 说明 |
+|------|------|------|
+| 新建 | `LICENSE` | MIT License |
+| 新建 | `.gitignore` | 覆盖 macOS/Windows/编辑器/临时文件 |
+| 新建 | `CONTRIBUTING.md` | 归档案例/改进模板/追加清单规则的贡献指南 |
+| 新建 | `AI协作方法论白皮书.md` | 14 章专业白皮书，含全链路逻辑、验证数据、实施指南 |
+| 修改 | `README.md` v2.1 | "快速上手"前新增"30 秒决策树" |
+| 修改 | `case-studies/README.md` | TaskFlow 链接文字更新为"框架验证项目" |
+
+---
+
+## v2.4 · 2026-04-10 · GitHub 首次上传 + 一键上传 Skill
+
+### GitHub 上传操作记录
+
+| 步骤 | 命令/操作 | 结果 |
+|------|---------|------|
+| 凭证绑定 | `git config --global credential.helper store` + 写入 `~/.git-credentials` | Token 永久存储 |
+| 新建仓库 | `curl POST /user/repos`（name: AI-Project-OS）| 仓库创建成功 |
+| 初始化 | `git init` + `git remote add origin` | 关联新仓库（非 seed-ai）|
+| 提交推送 | `git add` + `git commit` + `git push -u origin master` | 15 文件，3208 行，✅ |
+
+**关键踩坑**：
+- `curl -d` 传含中文的 JSON → `Problems parsing JSON` → 改 `--data-raw` + 纯英文描述
+- 必须先确认 remote 地址不是已有仓库，绝不 force push 已有仓库
+
+**新建 Skill**：`~/.claude/skills/github-upload.md`，触发 `/github-upload`
+
+---
+
+## v2.5 · 2026-04-10 · 双语 README + 工具无关性声明
+
+| 操作 | 文件 | 说明 |
+|------|------|------|
+| 新建 | `README.en.md` | 完整英文版，内容与中文版对应，互相链接 |
+| 修改 | `README.md` | 顶部加语言切换链接，新增"工具无关性"说明节 |
+
+**工具无关性要点**（已写入 README）：
+- 工作流模板、审查清单、约束提示词 → 任何 LLM 均可使用
+- `/skill` 触发命令 → 仅 Claude Code 专属快捷方式，其他工具直接阅读 `.md` 内容
+
+---
+
+## 当前系统文件清单
+
+```
+E:\AI-Methodology\
+├── README.md                          ✅ v2.2（含双语切换 + 工具无关性说明）
+├── README.en.md                       ✅ v1.0（英文版）
+├── BUILD_OPERATIONS.md                ✅ v2.5（本文件）
+├── AI协作方法论白皮书.md               ✅ v1.0（14章）
+├── LICENSE                            ✅ MIT（需将 [Author] 替换为真实姓名）
+├── .gitignore                         ✅
+├── CONTRIBUTING.md                    ✅
+│
+├── templates/
+│   ├── workflow-template.md           ✅ v2.1（6阶段 + 5附录 + Python适配）
+│   └── project-overlay-template.md   ✅ v1.0（8节结构）
+│
+├── checklists/
+│   └── code-review-checklist.md      ✅ v1.2（10类50项，含N/A机制）
+│
+├── prompts/
+│   ├── 02-code-review.md             ✅ v1.0
+│   ⚠️  01-architecture-design.md    ❌ 缺失（Backlog B-02）
+│   ⚠️  03-delivery-verification.md  ❌ 缺失（Backlog B-03）
+│
+└── case-studies/
+    ├── README.md                      ✅ v1.0（索引 + 高频坑 TOP 10）
+    ├── taskflow-api-2026-04.md        ✅ 框架验证案例
+    ├── 医保智能审核系统-2026-04.md    ✅ v1.0
+    ├── CDN边缘计算基础设施-2026-04.md ✅ v1.0
+    └── SeedAI-2026-04.md             ✅ v1.0
+
+历史文档（只读参考，不再更新）：
+├── 工作流.md        ← 医保系统原始记录
+├── 操作记忆库.md    ← CDN 系统原始记录
+└── OPERATIONS.md    ← Seed AI 原始记录
 ```
 
 ---
@@ -119,129 +159,44 @@
 
 | ID | 任务 | 完成版本 |
 |----|------|---------|
-| B-01 | 补全三个老项目的案例存档 `.md` 文件 | v2.2 · 2026-04-10 |
+| B-01 | 补全三个老项目案例存档 | v2.2 |
+| B-05 | README 加"30 秒决策树" | v2.3 |
 
 ### P1 — 重要，可在下次会话处理
 
 | ID | 任务 | 背景 |
 |----|------|------|
-| B-02 | 创建 `prompts/01-architecture-design.md` | 阶段二架构设计目前无专属提示词 |
-| B-03 | 创建 `prompts/03-delivery-verification.md` | 阶段五交付验证目前无专属提示词 |
-| B-04 | workflow-template.md 附录 B 新增 Rust/C++ 约束 | 扩展语言生态覆盖 |
+| B-02 | 创建 `prompts/01-architecture-design.md` | 阶段二架构设计无专属提示词 |
+| B-03 | 创建 `prompts/03-delivery-verification.md` | 阶段五交付验证无专属提示词 |
+| B-04 | workflow-template.md 附录 B 新增 Rust/C++ 约束 | 扩展语言覆盖 |
 
 ### P2 — 锦上添花
 
 | ID | 任务 | 背景 |
 |----|------|------|
-| ~~B-05~~ | ~~README 加"30秒决策树"~~ | ✅ 已完成（v2.3）|
-| B-06 | 创建10项精华版快速审查清单 | 小项目/时间有限时 45 项清单过重 |
-| B-07 | 建立摩擦点追踪表 | 长期追踪模板改进历史 |
-
----
-
-## 版本规范
-
-| 变化类型 | 版本号规则 | 示例 |
-|---------|-----------|------|
-| 新增内容（新清单项、新附录内容） | 小版本 +0.1 | v1.1 → v1.2 |
-| 修复错误（格式、链接、内容错误） | 小版本 +0.1 | v1.2 → v1.3 |
-| 结构性调整（新章节、重组） | 大版本 +1.0 | v1.x → v2.0 |
-| 重大重写 | 大版本 +1.0 | — |
-
----
-
----
-
-## v2.4 · 2026-04-10 · GitHub 上传 + 一键上传 Skill
-
-### 本次处理的任务
-
-**GitHub 首次上传（AI-Project-OS）**
-
-| 步骤 | 操作 | 结果 |
-|------|------|------|
-| 凭证绑定 | `git config --global credential.helper store` + 写入 `~/.git-credentials` | Token 永久存储，后续无需重新输入 |
-| 新建仓库 | GitHub API `POST /user/repos`（name: AI-Project-OS） | 仓库创建成功，不影响 seed-ai |
-| 初始化 & 关联 | `git init` + `git remote add origin` | 本地 .git 初始化，关联新仓库 |
-| 暂存 & 提交 | `git add`（显式列出15个目标文件）+ `git commit` | 15 文件，3208 行 |
-| 推送 | `git push -u origin master` | `* [new branch] master -> master` ✅ |
-
-**仓库地址**：https://github.com/jiayu6954-sudo/AI-Project-OS
-
-**关键踩坑**：
-- `curl -d` 传含中文描述的 JSON → `Problems parsing JSON` 错误 → 改为 `--data-raw` 并使用纯英文描述解决
-- 旧的错误 remote（seed-ai）需先 `git remote remove origin` 再重新添加
-
-**一键上传 Skill 创建**：
-- 路径：`~/.claude/skills/github-upload.md`
-- 触发：在 Claude Code 中输入 `/github-upload`
-- 覆盖范围：凭证绑定 → 新建仓库 → init → 暂存 → 提交 → 推送 → 验证 + 常见问题排查
-
----
-
-## v2.3 · 2026-04-10 · GitHub 打包 + 白皮书
-
-### 本次处理的任务
-
-| 操作 | 文件 | 说明 |
-|------|------|------|
-| 新建 | `LICENSE` | MIT License，`[Author]` 待替换 |
-| 新建 | `.gitignore` | 覆盖 macOS/Windows/编辑器/临时文件 |
-| 新建 | `CONTRIBUTING.md` | 归档案例/改进模板/追加清单规则的贡献指南 |
-| 新建 | `AI协作方法论白皮书.md` | 14 章专业白皮书，含全链路逻辑、验证数据、实施指南 |
-| 修改 | `README.md` | "快速上手"前新增"30 秒决策树"，版本升至 v2.1 |
-| 修改 | `case-studies/README.md` | TaskFlow 链接文字更新为"框架验证项目" |
-
----
-
-## 当前系统文件清单
-
-```
-E:\AI-Methodology\
-├── README.md                          ✅ v2.1
-├── BUILD_OPERATIONS.md                ✅ v2.3（本文件）
-├── LICENSE                            ✅ MIT（需替换 [Author]）
-├── .gitignore                         ✅ 新建
-├── CONTRIBUTING.md                    ✅ 新建
-├── AI协作方法论白皮书.md               ✅ v1.0（14章）
-│
-├── templates/
-│   ├── workflow-template.md           ✅ v2.1
-│   └── project-overlay-template.md   ✅ v1.0
-│
-├── checklists/
-│   └── code-review-checklist.md      ✅ v1.2
-│
-├── prompts/
-│   └── 02-code-review.md             ✅ v1.0
-│   ⚠️  01-architecture-design.md    ❌ 缺失（Backlog B-02）
-│   ⚠️  03-delivery-verification.md  ❌ 缺失（Backlog B-03）
-│
-└── case-studies/
-    ├── README.md                      ✅ v1.0
-    ├── taskflow-api-2026-04.md        ✅ 实测案例
-    ├── 医保智能审核系统-2026-04.md    ✅ v1.0
-    ├── CDN边缘计算基础设施-2026-04.md ✅ v1.0
-    └── SeedAI-2026-04.md             ✅ v1.0
-
-历史文档（只读参考）：
-├── 工作流.md        ← 医保系统原始记录
-├── 操作记忆库.md    ← CDN 系统原始记录
-└── OPERATIONS.md    ← Seed AI 原始记录
-```
-
----
+| B-06 | 10 项精华版快速审查清单 | 50 项对小项目过重 |
+| B-07 | 摩擦点追踪表 | 长期记录模板改进历史 |
 
 ---
 
 ## Claude Skill 清单
 
-| Skill 文件 | 触发命令 | 用途 |
-|-----------|---------|------|
-| `~/.claude/skills/ai-workflow.md` | `/ai-workflow` | 触发完整 6 阶段工作流 |
-| `~/.claude/skills/ai-methodology-ops.md` | `/ai-methodology-ops` | 快速恢复本仓库操作上下文 |
-| `~/.claude/skills/github-upload.md` | `/github-upload` | 一键打包上传 GitHub（新建仓库全流程）|
+| 触发命令 | 文件 | 用途 |
+|---------|------|------|
+| `/ai-workflow` | `~/.claude/skills/ai-workflow.md` | 触发完整 6 阶段工作流 |
+| `/ai-methodology-ops` | `~/.claude/skills/ai-methodology-ops.md` | 快速恢复本仓库操作上下文 |
+| `/github-upload` | `~/.claude/skills/github-upload.md` | 一键打包上传 GitHub |
 
 ---
 
-*BUILD_OPERATIONS 版本：v2.4 · 更新：2026-04-10 · 下次更新节点：B-02/B-03 提示词文件创建*
+## 版本规范
+
+| 变化类型 | 版本号规则 |
+|---------|-----------|
+| 新增内容（新清单项、新附录）| 小版本 +0.1 |
+| 修复错误（格式、链接、内容）| 小版本 +0.1 |
+| 结构性调整（新章节、重组）| 大版本 +1.0 |
+
+---
+
+*BUILD_OPERATIONS 版本：v2.5 · 更新：2026-04-10 · 下次更新节点：B-02/B-03 完成后*
