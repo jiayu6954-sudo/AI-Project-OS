@@ -1,5 +1,7 @@
-# AI-Methodology — AI 协作工程方法论库
+# AI-Project-OS — AI 协作工程方法论库
 
+> 中文 | [English](README.en.md)
+>
 > 一套经过三个工业级项目验证的 AI 协作标准化方法论。  
 > 让"AI + 人"的协作模式**可复制、可量化、可持续改进**。
 
@@ -120,7 +122,12 @@ cp memory\项目操作记忆.md \
 **在阶段三（代码审查时）**：将清单全文 + `02-code-review.md` 一起发给 AI  
 **在阶段六（知识沉淀时）**：追加本项目新发现的 Bug 模式
 
-### 3. 作为 Claude Code Skill 使用
+### 3. 与其他 AI 工具配合使用
+
+**本方法论完全工具无关**：工作流模板、审查清单、约束提示词均可直接复制粘贴到任何 LLM（ChatGPT / Gemini / Cursor / GitHub Copilot / 本地模型等）。  
+以下 Claude Code Skill 集成是可选的快捷方式，使用其他工具的用户跳过即可。
+
+### 4. 作为 Claude Code Skill 使用（可选）
 
 ```bash
 # 将工作流模板注册为 Skill（仅需操作一次）
